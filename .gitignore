@@ -2,3 +2,4 @@
 config.json
 *.sh
 log
+__pycache__/
