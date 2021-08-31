@@ -1,3 +1,3 @@
-# TODO garbage for everything (bot)
-# TODO handle quota (wrap)
-# TODO update only answer requests (bot + wrap)
+# garbage for everything (bot)
+# update only-answer requests (bot + wrap)
+# support multiple links, some extra formatting, custom api requests (bot + wrap)
