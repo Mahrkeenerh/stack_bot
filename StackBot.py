@@ -1,6 +1,5 @@
-import praw, datetime, sys, json, traceback, xmltodict, re, StackWrap, Logger, requests
-from requests.api import post
-from time import sleep, time
+import praw, datetime, json, xmltodict, re, StackWrap, Logger, requests
+from time import sleep
 from threading import Thread
 
 
@@ -240,7 +239,7 @@ def process_entry(entry, body):
             save_time()
 
             # ignore - not a question or answer
-            if post_info["type"] == None:
+            if post_info["type"] == None or post_info["id"] == None:
                 return
 
             # answer is linked

@@ -1,4 +1,4 @@
-import requests, json
+import requests
 
 
 # get complex json with question and answers
