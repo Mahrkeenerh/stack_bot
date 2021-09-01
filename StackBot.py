@@ -240,17 +240,20 @@ def process_entry(entry, body):
 
             # ignore - not a question or answer
             if post_info["type"] == None or post_info["id"] == None:
-                return
+                continue
 
             # answer is linked
             elif post_info["type"] == "a":
                 answer_id = post_info["id"]
                 question_id = StackWrap.get_question_id(answer_id, post_info["site"])
-
-                # can't find question
-                if "error_id" in question_id:
-                    respond_error(entry, link)
-                    return
+                
+                try:
+                    # can't find question
+                    if "error_id" in question_id:
+                        respond_error(entry, link)
+                        continue
+                except:
+                    pass
 
             # question is linked
             elif post_info["type"] == "q":
@@ -262,7 +265,7 @@ def process_entry(entry, body):
             # can't find question
             if "error_id" in post_raw:
                 respond_error(entry, link)
-                return
+                continue
 
             # respond
             if post_info["type"] == "q":
@@ -270,8 +273,6 @@ def process_entry(entry, body):
             
             elif post_info["type"] == "a":
                 respond_answer(entry, post_raw, answer_id)
-
-            return
 
 
 # search comments
