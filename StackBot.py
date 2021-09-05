@@ -108,42 +108,31 @@ def load_time():
         return load_time()
 
 
-# return link
-def get_link(body, forum):
+# return link, site, id and type
+def get_info(body):
 
     global forum_list
 
-    for item in body.split():
-        if forum in item:
-            item = re.sub("[\[\]\(\)\{\}\'\"]", " ", item)
+    posts = []
 
-            for sub_item in item.split():
-                if forum in sub_item:
+    for item in re.sub("[\[\]\(\)\{\}\'\"]", " ", body).split():
+        for forum in forum_list:
+            if forum in item:
+                posts.append({"link": item.strip()})
+                break                        
 
-                    return sub_item.strip()
+    for i in range(len(posts) - 1, -1, -1):
+        contents = posts[i]["link"].split("/")
 
+        try:
+            posts[i]["id"] = int(contents[4])
+            posts[i]["post_type"] = contents[3][0]
+            posts[i]["site"] = contents[2]
 
-# return question/answer id and type (q/a)
-def get_post_info(link):
+        except:
+            del posts[i]
 
-    contents = link.split("/")
-
-    try:
-        id = int(contents[4])
-    except:
-        id = None
-    
-    try:
-        post_type = contents[3][0]
-    except:
-        post_type = None
-    
-    try:
-        site = contents[2]
-    except:
-        site = None
-    
-    return {"id": id, "type": post_type, "site": site}
+    return posts    
 
 
 # replace triple backticks ``` with four spaces magically
@@ -225,54 +214,32 @@ def respond_error(entry, link):
 # check comment and post contents, match it and respond
 def process_entry(entry, body):
 
-    global forum_list
-
     lowercase_body = body.lower()
+    for post in get_info(lowercase_body):
+        
+        # ignore - not a question or answer
+        if post["type"] not in "qa":
+            continue
 
-    # check all forum sites
-    for forum in forum_list:
-        if forum in lowercase_body:
-            link = get_link(lowercase_body, forum)
-            post_info = get_post_info(link)
-            question_id = 0
+        if post["type"] == "q":
+            post_raw = StackWrap.get_question(post["id"], post["site"])
 
-            save_time()
-
-            # ignore - not a question or answer
-            if post_info["type"] == None or post_info["id"] == None:
-                continue
-
-            # answer is linked
-            elif post_info["type"] == "a":
-                answer_id = post_info["id"]
-                question_id = StackWrap.get_question_id(answer_id, post_info["site"])
-                
-                try:
-                    # can't find question
-                    if "error_id" in question_id:
-                        respond_error(entry, link)
-                        continue
-                except:
-                    pass
-
-            # question is linked
-            elif post_info["type"] == "q":
-                answer_id = None
-                question_id = post_info["id"]
-            
-            post_raw = StackWrap.get_question(question_id, post_info["site"])
-
-            # can't find question
+            # there's something wrong here
             if "error_id" in post_raw:
-                respond_error(entry, link)
-                continue
-
-            # respond
-            if post_info["type"] == "q":
+                respond_error(entry, post["link"])
+            else:
                 respond_question(entry, post_raw)
-            
-            elif post_info["type"] == "a":
-                respond_answer(entry, post_raw, answer_id)
+
+        # if post["type"] == "a":
+        #     post_raw = StackWrap.get_answer(post["id"], post["site"])
+
+        #     # there's something wrong here
+        #     if "error_id" in post_raw:
+        #         respond_error(entry, post["link"])
+        #     else:
+        #         respond_answer(entry, post_raw)
+
+        save_time()
 
 
 # search comments
