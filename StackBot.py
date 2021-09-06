@@ -126,7 +126,7 @@ def get_info(body):
 
         try:
             posts[i]["id"] = int(contents[4])
-            posts[i]["post_type"] = contents[3][0]
+            posts[i]["type"] = contents[3][0]
             posts[i]["site"] = contents[2]
 
         except:
