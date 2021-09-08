@@ -118,8 +118,10 @@ def get_info(body):
     for item in re.sub("[\[\]\(\)\{\}\'\"]", " ", body).split():
         for forum in forum_list:
             if forum in item:
-                posts.append({"link": item.strip()})
-                break                        
+                link = item.strip()
+                if link not in list(posts.values()):
+                    posts.append({"link": link})
+                    break
 
     for i in range(len(posts) - 1, -1, -1):
         contents = posts[i]["link"].split("/")
