@@ -119,7 +119,7 @@ def get_info(body):
         for forum in forum_list:
             if forum in item:
                 link = item.strip()
-                if link not in list(posts.values()):
+                if link not in [i["link"] for i in posts]:
                     posts.append({"link": link})
                     break
 
